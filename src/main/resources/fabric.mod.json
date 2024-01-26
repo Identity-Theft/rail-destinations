@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "rail_destinations",
+	"version": "${version}",
+	"name": "Rail Destinations",
+	"description": "Rail Destinations is a fabric port of the CivMC Rail Switch plugin",
+	"authors": [
+		"Identity Theft"
+	],
+	"contact": {
+		"homepage": "https://identity-theft.github.io/",
+		"sources": "https://github.com/Identity-Theft/rail-destinations/"
+	},
+	"license": "MIT",
+	"icon": "assets/rail_destinations/icon.png",
+	"environment": "server",
+	"entrypoints": {
+		"main": [
+			"identitytheft.rail_destinations.RailDestinations"
+		]
+	},
+	"mixins": [
+		"rail_destinations.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.6",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
