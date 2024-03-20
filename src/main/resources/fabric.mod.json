@@ -13,7 +13,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/rail_destinations/icon.png",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"identitytheft.rail_destinations.RailDestinations"
@@ -27,8 +27,5 @@
 		"minecraft": "~1.20.1",
 		"java": ">=17",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }

@@ -74,7 +74,7 @@ public abstract class DetectorRailMixin {
                     }
 
                     // Update rail's state based on if player's destination matched
-                    BlockState blockState = state.with(POWERED, type == SwitchType.NORMAL ? matched : !matched);
+                    BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == matched);
 
                     world.setBlockState(pos, blockState, 3);
                     world.scheduleBlockTick(pos, thisRail, 20);
