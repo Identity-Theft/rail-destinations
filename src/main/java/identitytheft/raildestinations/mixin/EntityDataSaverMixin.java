@@ -1,6 +1,6 @@
-package identitytheft.rail_destinations.mixin;
+package identitytheft.raildestinations.mixin;
 
-import identitytheft.rail_destinations.util.IEntityDataSaver;
+import identitytheft.raildestinations.util.IEntityDataSaver;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,15 +10,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class ModEntityDataSaverMixin implements IEntityDataSaver {
+public class EntityDataSaverMixin implements IEntityDataSaver {
     private NbtCompound persistentData;
 
     @Override
-    public NbtCompound getPersistentData() {
+    public NbtCompound getPersistentData()
+    {
         if (this.persistentData == null)
-        {
             this.persistentData = new NbtCompound();
-        }
 
         return persistentData;
     }

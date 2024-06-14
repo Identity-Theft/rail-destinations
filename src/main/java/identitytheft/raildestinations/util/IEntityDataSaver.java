@@ -1,4 +1,4 @@
-package identitytheft.rail_destinations.util;
+package identitytheft.raildestinations.util;
 
 import net.minecraft.nbt.NbtCompound;
 

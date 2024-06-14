@@ -1,12 +1,12 @@
-package identitytheft.rail_destinations.commands;
+package identitytheft.raildestinations.commands;
 
 import com.google.common.base.Strings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import identitytheft.rail_destinations.util.DestinationData;
-import identitytheft.rail_destinations.util.IEntityDataSaver;
+import identitytheft.raildestinations.util.DestinationData;
+import identitytheft.raildestinations.util.IEntityDataSaver;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;

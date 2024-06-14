@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "identitytheft.raildestinations.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "DetectorRailMixin",
+    "EntityDataSaverMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

@@ -1,10 +1,10 @@
-package identitytheft.rail_destinations.mixin;
+package identitytheft.raildestinations.mixin;
 
 import com.google.common.base.Strings;
-import identitytheft.rail_destinations.RailDestinations;
-import identitytheft.rail_destinations.util.DestinationData;
-import identitytheft.rail_destinations.util.IEntityDataSaver;
-import identitytheft.rail_destinations.util.SwitchType;
+import identitytheft.raildestinations.RailDestinations;
+import identitytheft.raildestinations.util.DestinationData;
+import identitytheft.raildestinations.util.IEntityDataSaver;
+import identitytheft.raildestinations.util.SwitchType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DetectorRailBlock;
 import net.minecraft.block.entity.SignBlockEntity;
@@ -52,7 +52,7 @@ public abstract class DetectorRailMixin {
                 // Get list of carts on rail
                 var carts = this.getCarts(world, pos, AbstractMinecartEntity.class, (entity1 -> true));
 
-                if (!carts.isEmpty() && carts.get(0).getFirstPassenger() instanceof PlayerEntity playerEntity)
+                if (!carts.isEmpty() && carts.getFirst().getFirstPassenger() instanceof PlayerEntity playerEntity)
                 {
                     var playerDestinations = DestinationData.getDest((IEntityDataSaver) playerEntity).split(" ");
                     var switchDestinations = Arrays.copyOfRange(signText, 1, signText.length);
