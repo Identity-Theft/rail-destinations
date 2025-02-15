@@ -3,46 +3,41 @@ package identitytheft.raildestinations.commands;
 import com.google.common.base.Strings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import identitytheft.raildestinations.util.DestinationData;
-import identitytheft.raildestinations.util.IEntityDataSaver;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import identitytheft.raildestinations.destination.PlayerDestinationProvider;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 public class DestCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment registrationEnvironment)
-    {
-        dispatcher.register(CommandManager.literal("dest").executes(context -> run(context, null))
-                .then(CommandManager.argument("destination", StringArgumentType.string())
-                        .executes(context -> run(context, StringArgumentType.getString(context, "destination")))));
+    public DestCommand(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("dest").executes(context -> run(context.getSource(), null))
+                .then(Commands.argument("destination", StringArgumentType.string())
+                        .executes(context -> run(context.getSource(), StringArgumentType.getString(context, "destination")))));
     }
 
-    private static int run(CommandContext<ServerCommandSource> context, @Nullable String dest) throws CommandSyntaxException {
-        var source = context.getSource();
-
-        if (source.getEntity() instanceof ServerPlayerEntity serverPlayerEntity)
+    private int run(CommandSourceStack source, @Nullable String dest) {
+        if (source.getEntity() instanceof ServerPlayer serverPlayer)
         {
-            if (Strings.isNullOrEmpty(dest))
-            {
-                // Get the player's destination if none was entered
-                var currentDest = DestinationData.getDest((IEntityDataSaver) serverPlayerEntity);
-                source.sendFeedback(() -> Text.literal("Your current destination is: " + currentDest), false);
-                return 1;
-            }
+            serverPlayer.getCapability(PlayerDestinationProvider.PLAYER_DEST).ifPresent(playerDestination -> {
+                if (Strings.isNullOrEmpty(dest))
+                {
+                    // Get the player's destination if none was entered
+                    var currentDest = playerDestination.getDest();
+                    source.sendSuccess(() -> Component.literal("Your current destination is: " + currentDest), false);
+                    return;
+                }
 
-            // Set the player's destination
-            source.sendFeedback(() -> Text.literal("Destination set to: " + dest), false);
-            DestinationData.setDest((IEntityDataSaver) serverPlayerEntity, dest);
+                // Set the player's destination
+                source.sendSuccess(() -> Component.literal("Destination set to: " + dest), false);
+                playerDestination.setDest(dest);
+            });
 
-            return 1;
+            if (serverPlayer.getCapability(PlayerDestinationProvider.PLAYER_DEST).isPresent()) return 1;
         }
 
-        source.sendError(Text.literal("Could not set your destination."));
+        source.sendFailure(Component.literal("Could not set your destination."));
         return -1;
     }
 }

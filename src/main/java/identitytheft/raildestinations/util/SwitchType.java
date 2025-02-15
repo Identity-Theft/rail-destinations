@@ -22,6 +22,7 @@ public enum SwitchType {
                 return type;
             }
         }
+
         return null;
     }
 
