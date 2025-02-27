@@ -3,16 +3,15 @@ package identitytheft.raildestinations.util;
 import net.minecraft.nbt.NbtCompound;
 
 public class DestinationData {
-    public static String setDest(IEntityDataSaver player, String dest)
+    public static void setDest(IEntityDataSaver player, String dest)
     {
-        NbtCompound nbt = player.getPersistentData();
+        NbtCompound nbt = player.rail_destinations$getPersistentData();
         nbt.putString("destination", dest);
 
-        return dest;
     }
 
     public static String getDest(IEntityDataSaver player)
     {
-        return player.getPersistentData().getString("destination");
+        return player.rail_destinations$getPersistentData().getString("destination");
     }
 }
