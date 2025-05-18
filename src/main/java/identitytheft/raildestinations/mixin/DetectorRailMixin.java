@@ -1,7 +1,6 @@
 package identitytheft.raildestinations.mixin;
 
 import com.google.common.base.Strings;
-import identitytheft.raildestinations.RailDestinations;
 import identitytheft.raildestinations.util.DestinationData;
 import identitytheft.raildestinations.util.IEntityDataSaver;
 import identitytheft.raildestinations.util.SwitchType;
@@ -13,11 +12,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,8 +33,6 @@ public abstract class DetectorRailMixin {
 
     @Shadow @Final public static BooleanProperty POWERED;
 
-    @Shadow protected abstract void updateNearbyRails(World world, BlockPos pos, BlockState state, boolean unpowering);
-
     @Inject(method = "updatePoweredStatus", at = @At("HEAD"), cancellable = true)
     public void updatePoweredStatus(World world, BlockPos pos, BlockState state, CallbackInfo ci)
     {
@@ -42,7 +41,7 @@ public abstract class DetectorRailMixin {
 
         if (above.isIn(BlockTags.SIGNS)) {
             var entity = (SignBlockEntity) world.getBlockEntity(pos.up());
-            var signText = entity.getFrontText().getMessages(false);
+			var signText = entity.getFrontText().getMessages(false);
             var line0 = signText[0];
 
             // Use the sign's first line to determine if it's a switch
@@ -54,35 +53,38 @@ public abstract class DetectorRailMixin {
 
                 if (!carts.isEmpty() && carts.getFirst().getFirstPassenger() instanceof PlayerEntity playerEntity)
                 {
-                    var playerDestinations = DestinationData.getDest((IEntityDataSaver) playerEntity).split(" ");
-                    var switchDestinations = Arrays.copyOfRange(signText, 1, signText.length);
+                    var playerDestinationData = DestinationData.getDest((IEntityDataSaver) playerEntity);
 
-                    boolean matched = false;
+                    if (!Strings.isNullOrEmpty(playerDestinationData)) {
+                        // Update rail's state based on if player's destination matched
+                        BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == hasMatchingDestination(signText, playerDestinationData.split(" ")));
 
-                    // Check if rail has matching destination
-                    for (var playerDestination: playerDestinations) {
-                        for (var switchDestination: switchDestinations) {
-                            if (Strings.isNullOrEmpty(switchDestination.getString())) continue;
+                        world.setBlockState(pos, blockState, 3);
+                        world.scheduleBlockTick(pos, thisRail, 20);
+                        world.updateComparators(pos, thisRail);
 
-                            if (playerDestination.equalsIgnoreCase(switchDestination.getString()))
-                            {
-                                RailDestinations.LOGGER.info("Destination matches");
-                                matched = true;
-                                break;
-                            }
-                        }
+                        ci.cancel();
                     }
-
-                    // Update rail's state based on if player's destination matched
-                    BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == matched);
-
-                    world.setBlockState(pos, blockState, 3);
-                    world.scheduleBlockTick(pos, thisRail, 20);
-                    world.updateComparators(pos, thisRail);
-
-                    ci.cancel();
                 }
             }
         }
+    }
+
+    @Unique
+    private static boolean hasMatchingDestination(Text[] signText, String[] playerDestinations) {
+        var signDestinations = Arrays.copyOfRange(signText, 1, signText.length);
+
+        // Check if rail has matching destination
+        for (var playerDestination: playerDestinations) {
+            for (var signDestination: signDestinations) {
+                if (Strings.isNullOrEmpty(signDestination.getString()))
+                    continue;
+
+                if (playerDestination.equalsIgnoreCase(signDestination.getString()))
+                    return true;
+            }
+        }
+
+        return false;
     }
 }

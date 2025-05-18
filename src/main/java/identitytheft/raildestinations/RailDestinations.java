@@ -2,7 +2,6 @@ package identitytheft.raildestinations;
 
 import identitytheft.raildestinations.commands.DestCommand;
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

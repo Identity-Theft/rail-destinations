@@ -33,8 +33,8 @@ public class EntityDataSaverMixin implements IEntityDataSaver {
 
     @Inject(method = "readNbt", at = @At("HEAD"))
     protected void injectReadMethod(NbtCompound nbt, CallbackInfo info) {
-        if (nbt.contains("identitytheft.railswitch", 10)) {
-            persistentData = nbt.getCompound("identitytheft.railswitch");
+        if (nbt.contains("identitytheft.railswitch")) {
+            persistentData = nbt.getCompoundOrEmpty("identitytheft.railswitch");
         }
     }
 }

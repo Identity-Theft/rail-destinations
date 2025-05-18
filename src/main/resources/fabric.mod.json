@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "rail_destinations",
+	"id": "rail-destinations",
 	"version": "${version}",
 	"name": "Rail Destinations",
 	"description": "Rail Destinations is a fabric port of the CivMC Rail Switch plugin",
@@ -23,8 +23,8 @@
 		"rail-destinations.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": ">=1.21.2",
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
 		"java": ">=21"
 	}
 }

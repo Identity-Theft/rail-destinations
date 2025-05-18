@@ -12,6 +12,6 @@ public class DestinationData {
 
     public static String getDest(IEntityDataSaver player)
     {
-        return player.rail_destinations$getPersistentData().getString("destination");
-    }
+		return player.rail_destinations$getPersistentData().getString("destination").orElse("");
+	}
 }
