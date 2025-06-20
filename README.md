@@ -10,7 +10,7 @@ Type `/dest destination` where `destination` is the place where you want to go. 
 
 ### Junction Setup
 1. Place a sign one block above a detector rail. Since junctions follow the [south-east rule](https://minecraft.wiki/w/South-east_rule) an inverter (shown below) may need to be built.
-2. The first line must be [destination]. You may also use [!destination], which will activate the rail if a player's destination is not on the signs.
+2. The first line must be `[destination]`. You may also use `[!destination]`, which will activate the rail if a player's destination is not on the signs.
 3. The other three lines can be destination names.
 
 
