@@ -1,18 +1,17 @@
 ### About
-Rail Destinations is a fabric port of the [RailSwitch](https://civwiki.org/wiki/RailSwitch) plugin used on the CivMC server that allows rails to automatically switch directions based on a specified destination.
+Rail Destinations is a fabric port of the [RailSwitch](https://civwiki.org/wiki/RailSwitch) plugin used on the CivMC server which allows detector rails to emit a restone signal only if a player in a minecart chooses the right destination.
 
 ***
 
-### Usage
-Type `/dest destination` where `destination` is the place where you want to go. You can also input multiple destinations `/dest "destination1 destination2"` this can be useful for taking a route via specific junctions, Rail Destinations will route players towards signs that contain either destination1 or destination2.
+### Command Usage
+Type `/dest destination` where `destination` is the place where you want to go. You can also input multiple destinations `/dest "destination1 destination2"` this can be useful for taking a route via specific junctions, Rail Destinations will route players towards signs that contain either `destination1` or `destination2`.
 
 ***
 
-### Setup
-1. Place a sign one block above a detector rail.
-2. The first line must be [destination] or [!destination] which will activate the rail if a player's destination is not on the sign.
-3. The second, third and fourth lines can be destination names.
-4. When a player passes over the detector rail, it will only activate and emit a redstone signal if the player has set their destination as any of the three on the sign.
+### Junction Setup
+1. Place a sign one block above a detector rail. Since junctions follow the [south-east rule](https://minecraft.wiki/w/South-east_rule) an inverter (shown below) may need to be built.
+2. The first line must be [destination]. You may also use [!destination], which will activate the rail if a player's destination is not on the signs.
+3. The other three lines can be destination names.
 
 
 ![Intersection](https://cdn.modrinth.com/data/UYOyMXzL/images/b8e3a6eb7b2f42eaa66991da61c06f1cb7c9865e.png)
@@ -22,7 +21,7 @@ Type `/dest destination` where `destination` is the place where you want to go. 
 ***
 
 ### Inverters
-Since intersections follow the [south-east rule](https://minecraft.wiki/w/South-east_rule) a redstone inverter will need to made to direct the rail in the other direction.
+An inverter can be used to changed the default direction of a junction.
 
 
 ![Redstone inverter](https://cdn.modrinth.com/data/UYOyMXzL/images/045dc8e82754a7a20c9181ecb286c1ddcf013250.png)
