@@ -1,6 +1,5 @@
 package identitytheft.raildestinations.mixin;
 
-import com.google.common.base.Strings;
 import identitytheft.raildestinations.util.DestinationData;
 import identitytheft.raildestinations.util.IEntityDataSaver;
 import identitytheft.raildestinations.util.SwitchType;
@@ -42,10 +41,9 @@ public abstract class DetectorRailMixin {
         if (above.isIn(BlockTags.SIGNS)) {
             var entity = (SignBlockEntity) world.getBlockEntity(pos.up());
 			var signText = entity.getFrontText().getMessages(false);
-            var line0 = signText[0];
 
             // Use the sign's first line to determine if it's a switch
-            var type = SwitchType.find(line0.getString());
+            var type = SwitchType.find(signText[0].getString().toLowerCase());
 
             if (type != null) {
                 // Get list of carts on rail
@@ -53,35 +51,30 @@ public abstract class DetectorRailMixin {
 
                 if (!carts.isEmpty() && carts.getFirst().getFirstPassenger() instanceof PlayerEntity playerEntity)
                 {
-                    var playerDestinationData = DestinationData.getDest((IEntityDataSaver) playerEntity);
+                    var playerDestination = DestinationData.getDest((IEntityDataSaver) playerEntity);
 
-                    if (!Strings.isNullOrEmpty(playerDestinationData)) {
-                        // Update rail's state based on if player's destination matched
-                        BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == hasMatchingDestination(signText, playerDestinationData.split(" ")));
+                    // Update rail's state based on if player's destination matched
+                    BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == hasMatchingDestination(signText, playerDestination));
 
-                        world.setBlockState(pos, blockState, 3);
-                        world.scheduleBlockTick(pos, thisRail, 20);
-                        world.updateComparators(pos, thisRail);
+                    world.setBlockState(pos, blockState, 3);
+                    world.scheduleBlockTick(pos, thisRail, 20);
+                    world.updateComparators(pos, thisRail);
 
-                        ci.cancel();
-                    }
+                    ci.cancel();
                 }
             }
         }
     }
 
     @Unique
-    private static boolean hasMatchingDestination(Text[] signText, String[] playerDestinations) {
-        var signDestinations = Arrays.copyOfRange(signText, 1, signText.length);
+    private static boolean hasMatchingDestination(Text[] signText, String playerDestination) {
+        var lines = Arrays.copyOfRange(signText, 1, signText.length);
+        var destinations = playerDestination.split(" ");
 
         // Check if rail has matching destination
-        for (var playerDestination: playerDestinations) {
-            for (var signDestination: signDestinations) {
-                if (Strings.isNullOrEmpty(signDestination.getString()))
-                    continue;
-
-                if (playerDestination.equalsIgnoreCase(signDestination.getString()))
-                    return true;
+        for (var line: lines) {
+            for (var destination: destinations) {
+                if (destination.equals("*") || destination.equalsIgnoreCase(line.getString())) return true;
             }
         }
 

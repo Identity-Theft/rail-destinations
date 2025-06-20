@@ -1,7 +1,6 @@
 package identitytheft.raildestinations.util;
 
-import net.minecraft.nbt.NbtCompound;
-
 public interface IEntityDataSaver {
-    NbtCompound rail_destinations$getPersistentData();
+    String rail_destinations$getDestination();
+    void rail_destinations$setDestination(String destination);
 }

@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import identitytheft.raildestinations.util.DestinationData;
 import identitytheft.raildestinations.util.IEntityDataSaver;
 import net.minecraft.command.CommandRegistryAccess;
@@ -18,11 +17,11 @@ public class DestCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment registrationEnvironment)
     {
         dispatcher.register(CommandManager.literal("dest").executes(context -> run(context, null))
-                .then(CommandManager.argument("destination", StringArgumentType.string())
+                .then(CommandManager.argument("destination", StringArgumentType.greedyString())
                         .executes(context -> run(context, StringArgumentType.getString(context, "destination")))));
     }
 
-    private static int run(CommandContext<ServerCommandSource> context, @Nullable String dest) throws CommandSyntaxException {
+    private static int run(CommandContext<ServerCommandSource> context, @Nullable String dest) {
         var source = context.getSource();
 
         if (source.getEntity() instanceof ServerPlayerEntity serverPlayerEntity)
