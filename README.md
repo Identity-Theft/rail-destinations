@@ -4,7 +4,7 @@ Rail Destinations is a fabric port of the [RailSwitch](https://civwiki.org/wiki/
 ***
 
 ### Command Usage
-Type `/dest destination` where `destination` is the place where you want to go. You can also input multiple destinations `/dest "destination1 destination2"` this can be useful for taking a route via specific junctions, Rail Destinations will route players towards signs that contain either `destination1` or `destination2`.
+Type `/dest <destination>` where `<destination>` is the place where you want to go. You can also input multiple destinations `/dest "<destination1> <destination2>"` this can be useful for taking a route via specific junctions, Rail Destinations will route players towards signs that contain either `<destination1>` or `<destination2>`.
 
 ***
 
