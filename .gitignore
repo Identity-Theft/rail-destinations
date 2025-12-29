@@ -28,9 +28,10 @@ bin/
 
 *.DS_Store
 
-# fabric
+# forge
 
 run/
+run-data/
 
 # java
 
