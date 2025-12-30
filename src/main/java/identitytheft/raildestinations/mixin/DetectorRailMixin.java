@@ -1,6 +1,5 @@
 package identitytheft.raildestinations.mixin;
 
-import identitytheft.raildestinations.util.DestinationData;
 import identitytheft.raildestinations.util.IEntityDataSaver;
 import identitytheft.raildestinations.util.SwitchType;
 import net.minecraft.block.BlockState;
@@ -40,20 +39,18 @@ public abstract class DetectorRailMixin {
 
         if (above.isIn(BlockTags.SIGNS)) {
             var entity = (SignBlockEntity) world.getBlockEntity(pos.up());
+			assert entity != null;
 			var signText = entity.getFrontText().getMessages(false);
 
-            // Use the sign's first line to determine if it's a switch
             var type = SwitchType.find(signText[0].getString().toLowerCase());
 
             if (type != null) {
-                // Get list of carts on rail
                 var carts = this.getCarts(world, pos, AbstractMinecartEntity.class, (entity1 -> true));
 
                 if (!carts.isEmpty() && carts.getFirst().getFirstPassenger() instanceof PlayerEntity playerEntity)
                 {
-                    var playerDestination = DestinationData.getDest((IEntityDataSaver) playerEntity);
+                    var playerDestination = ((IEntityDataSaver) playerEntity).rail_destinations$getDestination();
 
-                    // Update rail's state based on if player's destination matched
                     BlockState blockState = state.with(POWERED, (type == SwitchType.NORMAL) == hasMatchingDestination(signText, playerDestination));
 
                     world.setBlockState(pos, blockState, 3);
@@ -68,13 +65,16 @@ public abstract class DetectorRailMixin {
 
     @Unique
     private static boolean hasMatchingDestination(Text[] signText, String playerDestination) {
+		if (playerDestination.isEmpty()) return false;
+
         var lines = Arrays.copyOfRange(signText, 1, signText.length);
         var destinations = playerDestination.split(" ");
 
-        // Check if rail has matching destination
         for (var line: lines) {
+			if ("*".equals(line.getString()) || playerDestination.equalsIgnoreCase(line.getString())) return true;
+
             for (var destination: destinations) {
-                if (destination.equals("*") || destination.equalsIgnoreCase(line.getString())) return true;
+                if (destination.equalsIgnoreCase(line.getString())) return true;
             }
         }
 

@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import identitytheft.raildestinations.util.DestinationData;
 import identitytheft.raildestinations.util.IEntityDataSaver;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
@@ -28,20 +27,32 @@ public class DestCommand {
         {
             if (Strings.isNullOrEmpty(dest))
             {
-                // Get the player's destination if none was entered
-                var currentDest = DestinationData.getDest((IEntityDataSaver) serverPlayerEntity);
-                source.sendFeedback(() -> Text.literal("Your current destination is: " + currentDest), false);
+				((IEntityDataSaver) serverPlayerEntity).rail_destinations$setDestination("");
+                source.sendFeedback(() -> Text.literal("Unset destination (use /dest <destination> to set your destination)"), false);
                 return 1;
             }
 
-            // Set the player's destination
+			if (!isDestValid(dest))
+			{
+				source.sendError(Text.literal("Each destination can not be more than 40 characters."));
+				return 0;
+			}
+
             source.sendFeedback(() -> Text.literal("Destination set to: " + dest), false);
-            DestinationData.setDest((IEntityDataSaver) serverPlayerEntity, dest);
+			((IEntityDataSaver) serverPlayerEntity).rail_destinations$setDestination(dest);
 
             return 1;
         }
 
         source.sendError(Text.literal("Could not set your destination."));
-        return -1;
+        return 0;
     }
+
+	private static boolean isDestValid(String dest)
+	{
+		for (var d : dest.split(" "))
+			if (d.length() > 40) return false;
+
+		return true;
+	}
 }

@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public class EntityDataSaverMixin implements IEntityDataSaver {
+public abstract class EntityDataSaverMixin implements IEntityDataSaver {
     @Unique
-    private String destination;
+    private String destination = "";
 
     @Override
     public String rail_destinations$getDestination()
