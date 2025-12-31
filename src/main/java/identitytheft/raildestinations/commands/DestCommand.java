@@ -4,7 +4,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import identitytheft.raildestinations.destination.PlayerDestinationProvider;
+import identitytheft.raildestinations.RailDestinations;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -23,26 +23,20 @@ public class DestCommand {
 	{
 		if (source.getEntity() instanceof ServerPlayer serverPlayer)
 		{
-			serverPlayer.getCapability(PlayerDestinationProvider.PLAYER_DEST).ifPresent(playerDestination -> {
-				if (Strings.isNullOrEmpty(dest))
-				{
-					playerDestination.setDest("");
-					source.sendSuccess(() -> Component.literal("Unset destination (use /dest <destination> to set your destination)"), false);
-					return;
-				}
+			if (Strings.isNullOrEmpty(dest)) {
+				serverPlayer.setData(RailDestinations.DESTINATION, "");
+				source.sendSuccess(() -> Component.literal("Unset destination (use /dest <destination> to set your destination)"), false);
+				return 1;
+			}
 
-				if (!isDestValid(dest))
-				{
-					source.sendFailure(Component.literal("Each destination can not be more than 40 characters and may only use alphanumerical characters, ASCII symbols, and spaces."));
-					return;
-				}
+			if (!isDestValid(dest)) {
+				source.sendFailure(Component.literal("Each destination can not be more than 40 characters."));
+				return 0;
+			}
 
-				playerDestination.setDest(dest);
-				source.sendSuccess(() -> Component.literal("Destination set to: " + dest), false);
-			});
-
-
-			if (serverPlayer.getCapability(PlayerDestinationProvider.PLAYER_DEST).isPresent()) return 1;
+			serverPlayer.setData(RailDestinations.DESTINATION, dest);
+			source.sendSuccess(() -> Component.literal("Destination set to: " + dest), false);
+			return 1;
 		}
 
 		source.sendFailure(Component.literal("Failed to set destination"));
@@ -54,9 +48,6 @@ public class DestCommand {
 		for (var d : dest.split(" "))
 			if (d.length() > 40) return false;
 
-		return CharMatcher.inRange('0', '9')
-				.or(CharMatcher.inRange('a', 'z'))
-				.or(CharMatcher.inRange('A', 'Z'))
-				.or(CharMatcher.anyOf("!\"#$%&'()*+,-./;:<=>?@[]\\^_`{|}~ ")).matchesAllOf(dest);
+		return true;
 	}
 }

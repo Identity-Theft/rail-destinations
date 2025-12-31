@@ -1,73 +1,56 @@
 package identitytheft.raildestinations;
 
-import com.mojang.logging.LogUtils;
+import com.mojang.serialization.Codec;
 import identitytheft.raildestinations.commands.DestCommand;
-import identitytheft.raildestinations.destination.PlayerDestination;
-import identitytheft.raildestinations.destination.PlayerDestinationProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.registries.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import com.mojang.logging.LogUtils;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+
+import java.util.function.Supplier;
+
 @Mod(RailDestinations.MOD_ID)
-public class RailDestinations
-{
+public class RailDestinations {
     public static final String MOD_ID = "rail_destinations";
-	public static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public RailDestinations(FMLJavaModLoadingContext context)
-    {
-		IEventBus modEventBus = context.getModEventBus();
-		modEventBus.addListener(this::commonSetup);
+	private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MOD_ID);
 
-        MinecraftForge.EVENT_BUS.register(this);
+	public static final Supplier<AttachmentType<String>> DESTINATION = ATTACHMENT_TYPES.register(
+			"data", () -> AttachmentType.builder(() -> "").serialize(Codec.STRING.fieldOf("destination")).build()
+	);
+
+    public RailDestinations(IEventBus modEventBus, ModContainer modContainer) {
+        modEventBus.addListener(this::commonSetup);
+        NeoForge.EVENT_BUS.register(this);
+		ATTACHMENT_TYPES.register(modEventBus);
     }
 
-	private void commonSetup(final FMLCommonSetupEvent event)
-	{
+    private void commonSetup(FMLCommonSetupEvent event) {
 		LOGGER.info("Starting Rail Destinations!");
-	}
-
-    @SubscribeEvent
-    public void registerCommands(RegisterCommandsEvent event)
-    {
-		DestCommand.register(event.getDispatcher());
     }
 
 	@SubscribeEvent
-	public void onAttachPlayerCapabilities(AttachCapabilitiesEvent<Entity> event)
+	public void registerCommands(RegisterCommandsEvent event)
 	{
-		if (event.getObject() instanceof Player)
-		{
-			if (!event.getObject().getCapability(PlayerDestinationProvider.PLAYER_DEST).isPresent())
-				event.addCapability(new ResourceLocation(RailDestinations.MOD_ID, "properties"), new PlayerDestinationProvider());
-		}
+		DestCommand.register(event.getDispatcher());
 	}
 
 	@SubscribeEvent
 	public void onPlayerCloned(PlayerEvent.Clone event) {
-		if (event.isWasDeath()) {
-			event.getOriginal().getCapability(PlayerDestinationProvider.PLAYER_DEST).ifPresent(oldStore -> {
-				event.getOriginal().getCapability(PlayerDestinationProvider.PLAYER_DEST).ifPresent(newStore -> {
-					newStore.copyFrom(oldStore);
-				});
-			});
+		if (event.isWasDeath() && event.getOriginal().hasData(DESTINATION)) {
+			event.getEntity().setData(DESTINATION, event.getOriginal().getData(DESTINATION));
 		}
-	}
-
-	@SubscribeEvent
-	public void onRegisterCapabilities(RegisterCapabilitiesEvent event)
-	{
-		event.register(PlayerDestination.class);
 	}
 }

@@ -1,13 +1,14 @@
 {
   "required": true,
-  "minVersion": "0.7",
-  "package": "identitytheft.raildestinations.mixins",
-  "compatibilityLevel": "JAVA_17",
-  "refmap": "rail_destinations.refmap.json",
+  "package": "identitytheft.raildestinations.mixin",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "DetectorRailBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
   }
 }

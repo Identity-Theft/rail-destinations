@@ -1,13 +1,13 @@
-package identitytheft.raildestinations.mixins;
+package identitytheft.raildestinations.mixin;
 
-import identitytheft.raildestinations.destination.PlayerDestinationProvider;
+import identitytheft.raildestinations.RailDestinations;
 import identitytheft.raildestinations.util.SwitchType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DetectorRailBlock;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -28,41 +28,38 @@ import java.util.function.Predicate;
 @Mixin(DetectorRailBlock.class)
 public abstract class DetectorRailBlockMixin {
 	@Shadow
-	protected abstract <T extends AbstractMinecart> List<T> getInteractingMinecartOfType(Level pLevel, BlockPos pPos, Class<T> pCartType, Predicate<Entity> pFilter);
+	protected abstract <T extends AbstractMinecart> List<T> getInteractingMinecartOfType(Level world, BlockPos pos, Class<T> entityClass, Predicate<Entity> entityPredicate);
 
 	@Shadow @Final
 	public static BooleanProperty POWERED;
 
 	@Inject(method = "checkPressed", at = @At("HEAD"), cancellable = true)
-	public void rail_destinations$checkPressed(Level pLevel, BlockPos pPos, BlockState pState, CallbackInfo ci)
+	public void rail_destinations$checkPressed(Level level, BlockPos pos, BlockState state, CallbackInfo ci)
 	{
 		var thisRail = (DetectorRailBlock)(Object)this;
-		var above = pLevel.getBlockState(pPos.above());
+		var above = level.getBlockState(pos.above());
 
 		if (above.is(BlockTags.SIGNS)) {
-			var entity = (SignBlockEntity) pLevel.getBlockEntity(pPos.above());
+			var entity = (SignBlockEntity) level.getBlockEntity(pos.above());
 			assert entity != null;
 			var signText = entity.getFrontText().getMessages(false);
 
-			// Use the sign's first line to determine if it's a switch
 			var type = SwitchType.find(signText[0].getString().toLowerCase());
 
 			if (type != null) {
-				// Get list of carts on rail
-				var carts = this.getInteractingMinecartOfType(pLevel, pPos, AbstractMinecart.class, (entity1 -> true));
+				var carts = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, (entity1 -> true));
 
-				if (!carts.isEmpty() && carts.get(0).getFirstPassenger() instanceof Player playerEntity)
+				if (!carts.isEmpty() && carts.getFirst().getFirstPassenger() instanceof Player playerEntity)
 				{
-					playerEntity.getCapability(PlayerDestinationProvider.PLAYER_DEST).ifPresent(playerDestination -> {
-						// Update rail's state based on if player's destination matched
-						BlockState blockState = pState.setValue(POWERED, (type == SwitchType.NORMAL) == rail_destinations$hasMatchingDestination(signText, playerDestination.getDest()));
+					var playerDestination = playerEntity.getData(RailDestinations.DESTINATION);
 
-						pLevel.setBlock(pPos, blockState, 3);
-						pLevel.scheduleTick(pPos, thisRail, 20);
-						pLevel.updateNeighbourForOutputSignal(pPos, thisRail);
+					BlockState blockState = state.setValue(POWERED, (type == SwitchType.NORMAL) == rail_destinations$hasMatchingDestination(signText, playerDestination));
 
-						ci.cancel();
-					});
+					level.setBlock(pos, blockState, 3);
+					level.scheduleTick(pos, thisRail, 20);
+					level.updateNeighbourForOutputSignal(pos, thisRail);
+
+					ci.cancel();
 				}
 			}
 		}
@@ -71,16 +68,14 @@ public abstract class DetectorRailBlockMixin {
 	@Unique
 	private static boolean rail_destinations$hasMatchingDestination(Component[] signText, String playerDestination) {
 		if (playerDestination.isEmpty()) return false;
-		if (playerDestination.contains("*")) return true;
 
 		var lines = Arrays.copyOfRange(signText, 1, signText.length);
 		var destinations = playerDestination.split(" ");
 
-		// Check if rail has matching destination
-		for (var line : lines) {
+		for (var line: lines) {
 			if ("*".equals(line.getString()) || playerDestination.equalsIgnoreCase(line.getString())) return true;
 
-			for (var destination : destinations) {
+			for (var destination: destinations) {
 				if (destination.equalsIgnoreCase(line.getString())) return true;
 			}
 		}
