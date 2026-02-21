@@ -35,7 +35,6 @@ An inverter can be used to change the default direction of the T-junction.
 [![Modrinth](https://badges.penpow.dev/badges/available/modrinth/cozy-minimal.svg)](https://modrinth.com/mod/rail-destinations)
 [![GitHub](https://badges.penpow.dev/badges/available/github/cozy-minimal.svg)](https://github.com/Identity-Theft/rail-destinations)
 [![ko-fi](https://badges.penpow.dev/badges/donate/kofi-singular/cozy-minimal.svg)](https://ko-fi.com/identitytheft)
-[![website](https://badges.penpow.dev/badges/documentation/website/cozy-minimal.svg)](https://identity-theft.github.io/)
 
 ***
 
