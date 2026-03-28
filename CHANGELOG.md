@@ -1,4 +1,8 @@
-﻿# 1.0.3
+﻿# 1.0.4
+### Added:
+- Translation keys for all text
+
+# 1.0.3
 - Setting any line on a sign to `*` will activate the detector rail if the player has any destination set
 - Using `/dest` with no arguments will clear the player's destination
 - `[!destination]` now works when a player's destination is not set

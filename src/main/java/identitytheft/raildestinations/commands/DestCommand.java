@@ -5,46 +5,45 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import identitytheft.raildestinations.util.IEntityDataSaver;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 public class DestCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment registrationEnvironment)
-    {
-        dispatcher.register(CommandManager.literal("dest").executes(context -> run(context, null))
-                .then(CommandManager.argument("destination", StringArgumentType.greedyString())
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
+        dispatcher.register(Commands.literal("dest").executes(context -> run(context, null))
+                .then(Commands.argument("destination", StringArgumentType.greedyString())
                         .executes(context -> run(context, StringArgumentType.getString(context, "destination")))));
     }
 
-    private static int run(CommandContext<ServerCommandSource> context, @Nullable String dest) {
+    private static int run(CommandContext<CommandSourceStack> context, @Nullable String dest) {
         var source = context.getSource();
 
-        if (source.getEntity() instanceof ServerPlayerEntity serverPlayerEntity)
+        if (source.getEntity() instanceof ServerPlayer serverPlayer)
         {
             if (Strings.isNullOrEmpty(dest))
             {
-				((IEntityDataSaver) serverPlayerEntity).rail_destinations$setDestination("");
-                source.sendFeedback(() -> Text.literal("Unset destination (use /dest <destination> to set your destination)"), false);
+				((IEntityDataSaver) serverPlayer).rail_destinations$setDestination("");
+                source.sendSuccess(() -> Component.translatable("rail-destination.unset"), false);
                 return 1;
             }
 
 			if (!isDestValid(dest))
 			{
-				source.sendError(Text.literal("Each destination can not be more than 40 characters."));
+				source.sendFailure(Component.translatable("rail-destination.too_long"));
 				return 0;
 			}
 
-            source.sendFeedback(() -> Text.literal("Destination set to: " + dest), false);
-			((IEntityDataSaver) serverPlayerEntity).rail_destinations$setDestination(dest);
+            source.sendSuccess(() -> Component.translatable("rail-destination.set", dest), false);
+			((IEntityDataSaver) serverPlayer).rail_destinations$setDestination(dest);
 
             return 1;
         }
 
-        source.sendError(Text.literal("Could not set your destination."));
+        source.sendFailure(Component.translatable("rail-destination.failed"));
         return 0;
     }
 

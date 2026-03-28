@@ -8,7 +8,7 @@
 		"Identity Theft"
 	],
 	"contact": {
-		"homepage": "https://identity-theft.github.io/",
+		"homepage": "https://modrinth.com/mod/rail-destinations",
 		"sources": "https://github.com/Identity-Theft/rail-destinations/"
 	},
 	"license": "MIT",
@@ -23,9 +23,9 @@
 		"rail-destinations.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": ">=1.21.6",
-		"java": ">=21",
+		"fabricloader": ">=0.18.5",
+		"minecraft": "~26.1",
+		"java": ">=25",
         "fabric-api": "*"
 	}
 }

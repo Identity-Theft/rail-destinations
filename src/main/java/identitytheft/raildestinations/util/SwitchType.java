@@ -1,7 +1,5 @@
 package identitytheft.raildestinations.util;
 
-import org.apache.commons.lang3.StringUtils;
-
 public enum SwitchType {
 
     NORMAL("[destination]"),
@@ -18,7 +16,7 @@ public enum SwitchType {
             return null;
         }
         for (SwitchType type : values()) {
-            if (StringUtils.equalsIgnoreCase(tag, type.tag)) {
+            if (tag.equalsIgnoreCase(type.tag)) {
                 return type;
             }
         }

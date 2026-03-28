@@ -1,0 +1,6 @@
+{
+  "rail-destination.set": "Destination set to: %s",
+  "rail-destination.unset": "Unset destination (use /dest <destination> to set your destination)",
+  "rail-destination.too_long": "Each destination can not be more than 40 characters",
+  "rail-destination.failed": "Could not set your destination"
+}

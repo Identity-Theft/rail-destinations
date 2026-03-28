@@ -1,9 +1,9 @@
 package identitytheft.raildestinations.mixin;
 
 import identitytheft.raildestinations.util.IEntityDataSaver;
-import net.minecraft.entity.Entity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,13 +26,13 @@ public abstract class EntityDataSaverMixin implements IEntityDataSaver {
         this.destination = destination;
     }
 
-    @Inject(method = "writeData", at = @At("HEAD"))
-    public void rail_destinations$write(WriteView view, CallbackInfo ci) {
-        view.putString("identitytheft.railswitch", destination);
+    @Inject(method = "saveWithoutId", at = @At("HEAD"))
+    public void rail_destinations$write(ValueOutput output, CallbackInfo ci) {
+        output.putString("identitytheft.railswitch", destination);
     }
 
-    @Inject(method = "readData", at = @At("HEAD"))
-    public void rail_destinations$read(ReadView view, CallbackInfo ci) {
-        this.destination = view.getString("identitytheft.railswitch", "");
+    @Inject(method = "load", at = @At("HEAD"))
+    public void rail_destinations$read(ValueInput input, CallbackInfo ci) {
+        this.destination = input.getString("identitytheft.railswitch").orElse("");
     }
 }
